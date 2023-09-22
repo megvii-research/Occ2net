@@ -1,0 +1,4 @@
+QuadTreeAttention/build
+QuadTreeAttention/dist
+QuadTreeAttention/quadtree_attention_package.egg-info
+*.pyc
