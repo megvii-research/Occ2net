@@ -23,6 +23,8 @@ Occ2Net: 一种基于3D 占据估计的有效且稳健的带有遮挡区域图�
 总的来说，我们提出了一种能够识别遮挡点的图像匹配算法，该算法在真实世界和合成数据集上均优于最先进的方法。具体来说，我们的贡献如下：我们提出了一种新颖的能够识别遮挡的图像匹配算法Occ2Net，该算法使用三维占用模型来描绘物体之间的遮挡关系，并推断出被遮挡区域内匹配点的位置。我们将一个占用估计（Occupancy Estimation， OE）模块和一个遮挡感知（Occlusion-Aware, OA）模块结合起来，使用具有占用估计的粗到细结构实现可见-被遮挡匹配。我们的实验显示Occ2Net在真实世界数据集ScanNet和模拟数据集TartanAir上都实现了最先进的姿态估计精度。
 
     三． 实现方法
+    <img width="938" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/3f7f339d-ce68-4526-bfce-2af14ee966d7">
+
 
 上图展示了我们的Occ2Net的概述，它通过隐式模拟物体-遮挡关系，帮助在遮挡下进行匹配。我们的方法已经在各种可见-可见和可见-遮挡的情况下进行了广泛的测试，取得了与最新技术方法相当的成果。然而，在这一部分里，我们的主要关注点主要是挑战性较高的可见-遮挡匹配问题。
 
@@ -34,10 +36,14 @@ Occ2Net: 一种基于3D 占据估计的有效且稳健的带有遮挡区域图�
 我们设计了OA模块来实现粗略的匹配。OA模块主要由两部分组成：注意力组件和旋转对齐。注意力组件通过自注意力和交叉注意力，加深了对整个图像结构信息的理解，使得特征更有利于粗略匹配。旋转对齐旨在更好地适应不同视角之间的不同旋转，使得可见和被遮挡的部分更易于匹配。
 
 ### 旋转对齐
+<img width="444" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/851e6bd2-a755-4a04-8ccb-ceeb6b239fec">
 
 旋转对齐选择具有适当旋转角度的特征。在注意力组件之后，每个特征保留其接受区域的块信息。左图的特征经过适当的旋转后，会更接近于右图的特征，这进一步可以感知遮挡并使块匹配更加容易。例如，如上图所示，我们想要匹配图(a)和图(b)中由箭头指示的点。图(a)中的点被遮挡，在图(b)中可见。在粗略匹配阶段，我们需要匹配两个绿色的块。然而，由于遮挡区域的存在，两个块的特征会稍有不同。尽管我们在特征提取中扩大了接受域，并引入了更多周围信息，但我们不能消除遮挡的影响。旋转对齐的目标是增加两个块的特征相似性。考虑到我们使用2D旋转来补偿3D相机姿态的差异，图像的不同部分的旋转角度应该不同。为了防止旋转改变匹配块的指数，我们开发了一个局部特征旋转算法，对每个块特征进行局部旋转。由于我们不知道适当的旋转角度，我们使用gumbel softmax来选择最佳匹配的旋转角度。
 
 
+<img width="456" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/5cc1eb65-4d86-4b2f-83b9-fe215114de00">
+<img width="434" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/7be5cd1e-0f0f-41c2-825f-06fd2d2c0e84">
+<img width="457" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/af508fc3-2f97-4491-842b-d522c9b56d0a">
 
 
 因为我们不知道真实的旋转角度，根据经验我们选择0度和30度作为旋转角度。
@@ -61,12 +67,22 @@ Occ2Net: 一种基于3D 占据估计的有效且稳健的带有遮挡区域图�
 
 ### 3D占位loss
 为了从真实深度和相机姿态中生成真实的3D占用率，我们采取了以下步骤：通过结合两张图片的深度和相机姿态，创建一个真实的点云。将点云转化为体素表示，通过将3D空间划分为小立方体单元，并根据其3D占用情况给每个单元分配一个值。使用相机的姿态作为世界坐标系的原点，并将深度分辨率设置为64个体素，将体素表示投影到当前图片上。
+<img width="327" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/8ab6e4d8-3ffa-42da-8e6c-cf98b250bfc7">
 
 
 ### 细粒度匹配Loss
 参考LOFTR
+<img width="430" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/dcaeddfc-3ba4-4fc4-b438-a6bea3f36384">
+<img width="368" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/a72f7fdf-de0f-43c7-9c95-b774bc25a17f">
+<img width="333" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/9fc4daef-1998-4a8c-83fd-2cae69118194">
+<img width="444" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/1692a90f-fa7e-486c-9f08-226f09c86148">
+<img width="434" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/f0e18f33-1189-4f7a-be77-a4f01871c120">
+<img width="386" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/ec366426-91ef-4976-a9e2-c2f5f9a39946">
+<img width="304" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/6844bd0a-61ee-436d-bb9d-d92b8f2dba11">
+<img width="371" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/9cddfff5-4f07-43a1-a97c-af6df88c58b8">
 
 ### 整体Loss
+<img width="337" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/57f7297a-eab7-41cd-8490-37171c92c965">
 
     四． 实验
 我们通过在真实数据集ScanNet和模拟数据集Tartanair上的实验来验证我们方法的有效性。虽然MegaDepth[19]是一个常用于图像匹配的数据集，这也是一个真实的数据集，但我们没有采用它，因为它的深度地图误差比ScanNet的大。TartanAir是一个提供真实相机姿态和深度信息的模拟数据集，包括了像MegaDepth一样的室外场景。我们使用ScanNet和TartanAir数据集来展示在深度不准确的情况下，该算法的泛化能力和适应性，以及其在室内和室外场景中的有效性。
@@ -77,9 +93,11 @@ TartanAir[43] 是一个用于评估SLAM算法的具有挑战性的合成基准�
 
 ### 实验结果
 上图展示了ScanNet、TartanAir-室内和TartanAir-室外的匹配示例。我们将QuadTree LoFTR [39]与我们的结果进行了比较。绿色和黄色的线分别表示QuadTree LoFTR和Occ2Net的正确匹配，而红色的线则代表错误的匹配（误差超过10像素）。我们用紫色的框突出显示了一些匹配对。蓝色的遮罩标注了正确的匹配区域。图(a)的左图和右图分别包含了讲台和椅子的不同视角。图(b)的左图包含了墙壁和，而且部分被显示屏遮挡。图(b)的右图仅包含墙壁。图(c)的左图只有灯光和，而右图包含了灯光、和。
+<img width="919" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/06b4b867-6cb5-4f18-9bb9-dd2bf5802985">
 
 我们遵循SuperGlue的研究方法superglue，报告姿态错误在几个阈值5度， 10度, 20度下的百分比AUC。这里的姿态错误被定义为旋转中的角度误差和平移中的位移误差的最大值。为了恢复相机的姿态，我们解出预测匹配中的本质矩阵，使用RANSAC方法[8]。
 
+<img width="296" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/6abdd96b-4595-4809-9753-90f738650bc9">
 
 如上表所示，我们的方法在ScanNet和TartanAir上的姿态估计精度上都超过了所有竞争对手，展示了我们的方法在室内外、真实和模拟场景中的有效性。Occ2Net-s是Occ2Net-l的一个缩略版本，它没有明确区分可见和遮挡的点，而且所有匹配都共享权重和张量，参数比QuadTree LoFTR少。
 
@@ -88,8 +106,10 @@ TartanAir[43] 是一个用于评估SLAM算法的具有挑战性的合成基准�
 ### 遮挡对于位姿估计的有效性
 
 我们为了量化分析遮挡对姿态估计的影响，我们计算了ScanNet测试集中所有图像对的遮挡比率。遮挡比率定义为在一张图像中可见但在另一张图像中被遮挡的像素的比率。接着，我们将累积估计误差R和t作为遮挡比率的函数进行绘图。如图所示，在具有高遮挡比率的图像对中，其他算法在姿态估计方面的误差相对较大，而我们的算法仍能在这些具有挑战性的场景中达到较小的姿态误差。
+<img width="286" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/8bf14edc-2f99-4fcc-9a07-1286801e2b70">
 
 ### 消融实验
+<img width="509" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/6e9264d4-9f23-41ed-91f3-f118b2263767">
 
 以上表格各实验含义：1）基准线：QuadTree LoFTR。2）基准线+遮挡损失：仅添加可见-遮挡匹配以进行监督；3）Occ2Net -遮挡损失：使用Occ2Net，而不进行遮挡监督；4）基准线+特征提取：使用我们的特征提取骨干网络，取代LoFTR特征提取骨干网络；5）实验4)+遮挡损失：使用我们的特征提取骨干网络并添加可见-遮挡匹配以进行监督；6）基准线+OA模块：添加旋转对齐方法；7）Occ2Net -占用：Occ2Net不进行3D占用估计；8）Occ2Net：我们的方法。
 
