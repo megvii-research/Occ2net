@@ -1,9 +1,9 @@
 # Occ2net [ICCV 2023]
-- Occ2Net: Robust Image Matching Based on 3D Occupancy Estimation for Occluded Regions
+#### Occ2Net: Robust Image Matching Based on 3D Occupancy Estimation for Occluded Regions
   
-- Occ2Net: 一种基于3D 占据估计的有效且稳健的带有遮挡区域图像匹配方法
+#### Occ2Net: 一种基于3D 占据估计的有效且稳健的带有遮挡区域图像匹配方法
 
-- 论文链接：https://arxiv.org/abs/2308.16160
+#### 论文链接：https://arxiv.org/abs/2308.16160
 
 Image matching is a fundamental and critical task in various visual applications, such as Simultaneous Localization and Mapping (SLAM) and image retrieval, which require accurate pose estimation. However, most existing methods ignore the occlusion relations between objects caused by camera motion and scene structure. In this paper, we propose Occ2Net, a novel image matching method that models occlusion relations using 3D occupancy and infers matching points in occluded regions. Thanks to the inductive bias encoded in the Occupancy Estimation (OE) module, it greatly simplifies bootstrapping of a multi-view consistent 3D representation that can then integrate information from multiple views. Together with an Occlusion-Aware (OA) module, it incorporates attention layers and rotation alignment to enable matching between occluded and visible points. We evaluate our method on both real-world and simulated datasets and demonstrate its superior performance over state-of-the-art methods on several metrics, especially in occlusion scenarios.
 <img width="568" alt="图片" src="https://github.com/megvii-research/Occ2net/assets/106311350/681a9bb8-593c-4f25-84f1-e62dad238051">
